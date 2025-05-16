@@ -1,10 +1,11 @@
 'use client';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useId, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Contact, useContactsStore } from '../store/useContactsStore';
 import AddContact from './components/AddContact';
 import ContactsList from './components/ContactsList';
 import Pager from './components/Pager';
+import SearchField from './components/SearchField';
 import Share from './components/Share';
 
 export default function Home() {
@@ -15,9 +16,6 @@ export default function Home() {
   // Flag to prevent infinite updates
   const isUpdatingFromURL = useRef(false);
   const isFirstMount = useRef(true);
-
-  // Generate unique IDs for form inputs
-  const searchInputId = useId();
 
   // Animation states for loading and appearance effects
   const [isLoading, setIsLoading] = useState(true);
@@ -176,9 +174,8 @@ export default function Home() {
   }
 
   // Update search term and page
-  function handleSearchChange(e: { target: { value: any } }) {
-    const newSearchTerm = e.target.value;
-    setSearchTerm(newSearchTerm);
+  function handleSearchChange(value: string) {
+    setSearchTerm(value);
     setPage(1); // Reset to first page on search change
   }
 
@@ -246,26 +243,11 @@ export default function Home() {
         <h2 className="text-xl text-gray-300 font-medium">Contacts</h2>
 
         <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
-          <div className="relative w-full sm:w-64">
-            <input
-              id={searchInputId}
-              type="text"
-              value={searchTerm}
-              onChange={handleSearchChange}
-              placeholder="Search contacts..."
-              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-100 placeholder-gray-400"
-            />
-            {searchTerm && (
-              <button
-                onClick={function () {
-                  setSearchTerm('');
-                }}
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-200"
-              >
-                ✕
-              </button>
-            )}
-          </div>
+          <SearchField
+            value={searchTerm}
+            onChange={handleSearchChange}
+            placeholder="Search contacts..."
+          />
 
           <div className="flex space-x-2">
             <button
