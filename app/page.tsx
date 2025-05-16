@@ -7,6 +7,7 @@ import ContactsList from './components/ContactsList';
 import Pager from './components/Pager';
 import SearchField from './components/SearchField';
 import Share from './components/Share';
+import SortButton from './components/SortButton';
 
 export default function Home() {
   // Router for URL manipulation
@@ -250,37 +251,21 @@ export default function Home() {
           />
 
           <div className="flex space-x-2">
-            <button
-              onClick={function () {
-                setSortField('name');
-              }}
-              className={
-                isSorting && sortField === 'name'
-                  ? 'px-3 py-1 rounded-md text-sm font-medium flex items-center bg-purple-600 text-white'
-                  : 'px-3 py-1 rounded-md text-sm font-medium flex items-center bg-gray-700 text-gray-300 hover:bg-gray-600'
-              }
+            <SortButton
+              name="name"
+              direction={isSorting && sortField === 'name' ? sortDirection : null}
+              onClick={setSortField}
             >
               Name
-              {isSorting && sortField === 'name' && (
-                <span className="ml-2">{sortDirection === 'asc' ? '↑' : '↓'}</span>
-              )}
-            </button>
+            </SortButton>
 
-            <button
-              onClick={function () {
-                setSortField('city');
-              }}
-              className={
-                isSorting && sortField === 'city'
-                  ? 'px-3 py-1 rounded-md text-sm font-medium flex items-center bg-purple-600 text-white'
-                  : 'px-3 py-1 rounded-md text-sm font-medium flex items-center bg-gray-700 text-gray-300 hover:bg-gray-600'
-              }
+            <SortButton
+              name="city"
+              direction={isSorting && sortField === 'city' ? sortDirection : null}
+              onClick={setSortField}
             >
               City
-              {isSorting && sortField === 'city' && (
-                <span className="ml-2">{sortDirection === 'asc' ? '↑' : '↓'}</span>
-              )}
-            </button>
+            </SortButton>
 
             <button
               onClick={resetSorting}
