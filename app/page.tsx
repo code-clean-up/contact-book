@@ -5,6 +5,7 @@ import { Contact, useContactsStore } from '../store/useContactsStore';
 import AddContact from './components/AddContact';
 import ContactsList from './components/ContactsList';
 import EmptyResults from './components/EmptyResults';
+import ListHeader from './components/ListHeader';
 import Loader from './components/Loader';
 import Pager from './components/Pager';
 import SearchField from './components/SearchField';
@@ -243,28 +244,24 @@ export default function Home() {
 
       <AddContact onContactAdd={addContact} />
 
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center max-w-6xl mx-auto mb-6 px-2 space-y-4 sm:space-y-0">
-        <h2 className="text-xl text-gray-300 font-medium">Contacts</h2>
+      <ListHeader title="Contacts">
+        <SearchField
+          value={searchTerm}
+          onChange={handleSearchChange}
+          placeholder="Search contacts..."
+        />
 
-        <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
-          <SearchField
-            value={searchTerm}
-            onChange={handleSearchChange}
-            placeholder="Search contacts..."
-          />
-
-          <Sorter
-            options={[
-              { name: 'name', label: 'Name' },
-              { name: 'city', label: 'City' },
-            ]}
-            field={sortField}
-            direction={sortDirection}
-            setSortField={setSortField}
-            resetSorting={resetSorting}
-          />
-        </div>
-      </div>
+        <Sorter
+          options={[
+            { name: 'name', label: 'Name' },
+            { name: 'city', label: 'City' },
+          ]}
+          field={sortField}
+          direction={sortDirection}
+          setSortField={setSortField}
+          resetSorting={resetSorting}
+        />
+      </ListHeader>
 
       {isLoading && <Loader>Loading contacts...</Loader>}
 
