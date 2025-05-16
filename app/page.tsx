@@ -10,6 +10,7 @@ import Pager from './components/Pager';
 import SearchField from './components/SearchField';
 import Share from './components/Share';
 import Sorter from './components/Sorter';
+import Title from './components/Title';
 
 export default function Home() {
   // Router for URL manipulation
@@ -238,7 +239,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-900 p-8 pb-20 sm:p-20">
-      <h1 className="mb-6 w-full text-center text-4xl font-bold text-gray-100">Contact Book</h1>
+      <Title>Contact Book</Title>
 
       <AddContact onContactAdd={addContact} />
 
