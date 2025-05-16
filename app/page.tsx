@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Contact, useContactsStore } from '../store/useContactsStore';
 import AddContact from './components/AddContact';
 import ContactsList from './components/ContactsList';
+import EmptyResults from './components/EmptyResults';
 import Loader from './components/Loader';
 import Pager from './components/Pager';
 import SearchField from './components/SearchField';
@@ -267,17 +268,13 @@ export default function Home() {
       {isLoading && <Loader>Loading contacts...</Loader>}
 
       {!isLoading && processedContacts.length === 0 && (
-        <div className="text-center py-10">
-          <p className="text-gray-400 text-lg">No contacts found matching "{searchTerm}"</p>
-          <button
-            onClick={function () {
-              setSearchTerm('');
-            }}
-            className="mt-3 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors cursor-pointer"
-          >
-            Clear search
-          </button>
-        </div>
+        <EmptyResults
+          onSearchClean={function () {
+            setSearchTerm('');
+          }}
+        >
+          No contacts found matching "{searchTerm}"
+        </EmptyResults>
       )}
 
       <ContactsList
