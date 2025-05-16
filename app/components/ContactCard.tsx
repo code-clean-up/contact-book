@@ -1,11 +1,46 @@
+import { Contact } from '@/store/useContactsStore';
 import { PropsWithChildren } from 'react';
+
+type ContactViewProps = {
+  contact: Contact;
+  onStartEdit: (contact: Contact) => void;
+};
 
 type ContactCardProps = PropsWithChildren<{
   isVisible?: boolean;
+  isEditing?: boolean;
   transitionDelay?: number;
+  contact: Contact;
+  onStartEdit: (contact: Contact) => void;
 }>;
 
-export default function ContactCard({ isVisible, transitionDelay, children }: ContactCardProps) {
+function ContactView({ contact, onStartEdit }: ContactViewProps) {
+  return (
+    <>
+      <h2 className="text-xl font-semibold text-gray-100 mb-1">{contact.name}</h2>
+      <p className="text-gray-400 mb-4">{contact.city}</p>
+      <div className="flex justify-end mt-2">
+        <button
+          onClick={function () {
+            onStartEdit(contact);
+          }}
+          className="border border-purple-400 text-purple-400 px-4 py-2 rounded-md text-sm font-medium hover:border-purple-300 hover:text-purple-300 transition-colors shadow-sm cursor-pointer"
+        >
+          Edit
+        </button>
+      </div>
+    </>
+  );
+}
+
+export default function ContactCard({
+  isVisible,
+  isEditing,
+  contact,
+  transitionDelay,
+  children,
+  onStartEdit,
+}: ContactCardProps) {
   return (
     <div
       className={
@@ -14,7 +49,7 @@ export default function ContactCard({ isVisible, transitionDelay, children }: Co
       }
       style={{ transitionDelay: `${transitionDelay}ms` }}
     >
-      {children}
+      {isEditing ? children : <ContactView contact={contact} onStartEdit={onStartEdit} />}
     </div>
   );
 }

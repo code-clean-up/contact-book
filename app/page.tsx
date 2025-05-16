@@ -310,23 +310,6 @@ export default function Home() {
             </div>
           </>
         );
-      } else {
-        cardContent = (
-          <>
-            <h2 className="text-xl font-semibold text-gray-100 mb-1">{contact.name}</h2>
-            <p className="text-gray-400 mb-4">{contact.city}</p>
-            <div className="flex justify-end mt-2">
-              <button
-                onClick={function () {
-                  startEditing(contact);
-                }}
-                className="border border-purple-400 text-purple-400 px-4 py-2 rounded-md text-sm font-medium hover:border-purple-300 hover:text-purple-300 transition-colors shadow-sm cursor-pointer"
-              >
-                Edit
-              </button>
-            </div>
-          </>
-        );
       }
 
       contactCards.push(
@@ -334,6 +317,9 @@ export default function Home() {
           key={contact.id}
           isVisible={visibleCards[contact.id]}
           transitionDelay={index * 50}
+          contact={contact}
+          onStartEdit={startEditing}
+          isEditing={editingId === contact.id}
         >
           {cardContent}
         </ContactCard>
