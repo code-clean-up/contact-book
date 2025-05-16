@@ -5,6 +5,7 @@ import { Contact, useContactsStore } from '../store/useContactsStore';
 import AddContact from './components/AddContact';
 import ContactsList from './components/ContactsList';
 import EmptyResults from './components/EmptyResults';
+import Footer from './components/Footer';
 import ListHeader from './components/ListHeader';
 import Loader from './components/Loader';
 import Pager from './components/Pager';
@@ -286,11 +287,11 @@ export default function Home() {
         <>
           <Pager currentPage={currentPage} totalPages={totalPages} goToPage={paginate} />
 
-          <div className="text-center mt-4 text-gray-400">
+          <Footer>
             Page {currentPage} of {totalPages} • Showing {indexOfFirstContact + 1}-
             {Math.min(indexOfLastContact, processedContacts.length)} of {processedContacts.length}
             {searchTerm ? ' filtered' : ''} contacts
-          </div>
+          </Footer>
         </>
       )}
 
