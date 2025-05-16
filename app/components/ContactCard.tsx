@@ -1,18 +1,25 @@
 import { Contact } from '@/store/useContactsStore';
-import { PropsWithChildren } from 'react';
+import { useState } from 'react';
 
 type ContactViewProps = {
   contact: Contact;
   onStartEdit: (contact: Contact) => void;
 };
 
-type ContactCardProps = PropsWithChildren<{
-  isVisible?: boolean;
-  isEditing?: boolean;
-  transitionDelay?: number;
+type ContactFormProps = {
   contact: Contact;
-  onStartEdit: (contact: Contact) => void;
-}>;
+  onContactDelete: (id: string) => void;
+  onCancelEditing: () => void;
+  onContactSave: (id: string, name: string, city: string) => void;
+};
+
+type ContactCardProps = {
+  contact: Contact;
+  isVisible?: boolean;
+  transitionDelay?: number;
+  onContactDelete: (id: string) => void;
+  onContactSave: (id: string, name: string, city: string) => void;
+};
 
 function ContactView({ contact, onStartEdit }: ContactViewProps) {
   return (
@@ -33,14 +40,86 @@ function ContactView({ contact, onStartEdit }: ContactViewProps) {
   );
 }
 
+function ContactForm({
+  contact,
+  onContactDelete,
+  onCancelEditing,
+  onContactSave,
+}: ContactFormProps) {
+  function handleSubmit(data: FormData) {
+    const trimmedName = String(data.get('name') ?? '').trim();
+    const trimmedCity = String(data.get('city') ?? '').trim();
+
+    if (!trimmedName || !trimmedCity) return;
+
+    onContactSave(contact.id, trimmedName, trimmedCity);
+  }
+
+  return (
+    <form action={handleSubmit}>
+      <input
+        type="text"
+        name="name"
+        defaultValue={contact.name}
+        className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md mb-3 focus:outline-none focus:ring-1 focus:ring-purple-500 text-gray-100"
+      />
+      <input
+        type="text"
+        name="city"
+        defaultValue={contact.city}
+        className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md mb-4 focus:outline-none focus:ring-1 focus:ring-purple-500 text-gray-100"
+      />
+      <div className="flex justify-between mt-4">
+        <button
+          type="button"
+          onClick={function () {
+            onContactDelete(contact.id);
+          }}
+          className="bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-red-700 transition-colors flex items-center shadow-sm cursor-pointer"
+        >
+          Delete
+        </button>
+        <div className="flex space-x-3">
+          <button
+            type="button"
+            onClick={onCancelEditing}
+            className="bg-gray-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-700 transition-colors shadow-sm cursor-pointer"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="bg-purple-500 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-purple-600 transition-colors shadow-sm cursor-pointer"
+          >
+            Save
+          </button>
+        </div>
+      </div>
+    </form>
+  );
+}
+
 export default function ContactCard({
   isVisible,
-  isEditing,
   contact,
   transitionDelay,
-  children,
-  onStartEdit,
+  onContactDelete,
+  onContactSave,
 }: ContactCardProps) {
+  const [isEditing, setEditing] = useState(false);
+  function startEditing() {
+    setEditing(true);
+  }
+
+  function cancelEditing() {
+    setEditing(false);
+  }
+
+  function saveChanges(id: string, name: string, city: string) {
+    onContactSave(id, name, city);
+    setEditing(false);
+  }
+
   return (
     <div
       className={
@@ -49,7 +128,16 @@ export default function ContactCard({
       }
       style={{ transitionDelay: `${transitionDelay}ms` }}
     >
-      {isEditing ? children : <ContactView contact={contact} onStartEdit={onStartEdit} />}
+      {isEditing ? (
+        <ContactForm
+          contact={contact}
+          onCancelEditing={cancelEditing}
+          onContactDelete={onContactDelete}
+          onContactSave={saveChanges}
+        />
+      ) : (
+        <ContactView contact={contact} onStartEdit={startEditing} />
+      )}
     </div>
   );
 }

@@ -40,9 +40,6 @@ export default function Home() {
 
   // Initialize local form states with values from URL if available
   const [searchTerm, setSearchTerm] = useState(() => searchParams.get('search') || '');
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editName, setEditName] = useState('');
-  const [editCity, setEditCity] = useState('');
 
   // Pagination constants
   const contactsPerPage = 9;
@@ -203,25 +200,8 @@ export default function Home() {
     setPage(pageNumber);
   }
 
-  function startEditing(contact: Contact) {
-    setEditingId(contact.id);
-    setEditName(contact.name);
-    setEditCity(contact.city);
-  }
-
-  function cancelEditing() {
-    setEditingId(null);
-  }
-
-  function saveChanges(id: string) {
-    const trimmedName = editName.trim();
-    const trimmedCity = editCity.trim();
-
-    if (!trimmedName || !trimmedCity) return;
-
-    updateContact(id, trimmedName, trimmedCity);
-
-    setEditingId(null);
+  function saveChanges(id: string, name: string, city: string) {
+    updateContact(id, name, city);
   }
 
   // Animation effect - updated to avoid card jumping
@@ -262,67 +242,15 @@ export default function Home() {
       const contact = currentContacts[i];
       const index = i;
 
-      let cardContent;
-      if (editingId === contact.id) {
-        cardContent = (
-          <>
-            <input
-              type="text"
-              value={editName}
-              onChange={function (e) {
-                setEditName(e.target.value);
-              }}
-              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md mb-3 focus:outline-none focus:ring-1 focus:ring-purple-500 text-gray-100"
-            />
-            <input
-              type="text"
-              value={editCity}
-              onChange={function (e) {
-                setEditCity(e.target.value);
-              }}
-              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md mb-4 focus:outline-none focus:ring-1 focus:ring-purple-500 text-gray-100"
-            />
-            <div className="flex justify-between mt-4">
-              <button
-                onClick={function () {
-                  deleteContact(contact.id);
-                }}
-                className="bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-red-700 transition-colors flex items-center shadow-sm cursor-pointer"
-              >
-                <span>Delete</span>
-              </button>
-              <div className="flex space-x-3">
-                <button
-                  onClick={cancelEditing}
-                  className="bg-gray-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-700 transition-colors shadow-sm cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={function () {
-                    saveChanges(contact.id);
-                  }}
-                  className="bg-purple-500 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-purple-600 transition-colors shadow-sm cursor-pointer"
-                >
-                  Save
-                </button>
-              </div>
-            </div>
-          </>
-        );
-      }
-
       contactCards.push(
         <ContactCard
           key={contact.id}
           isVisible={visibleCards[contact.id]}
           transitionDelay={index * 50}
           contact={contact}
-          onStartEdit={startEditing}
-          isEditing={editingId === contact.id}
-        >
-          {cardContent}
-        </ContactCard>
+          onContactDelete={deleteContact}
+          onContactSave={saveChanges}
+        />
       );
     }
   }
