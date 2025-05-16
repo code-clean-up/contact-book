@@ -1,5 +1,5 @@
 import { Contact } from '@/store/useContactsStore';
-import { useState } from 'react';
+import { CSSProperties, useState } from 'react';
 
 type ContactViewProps = {
   contact: Contact;
@@ -15,10 +15,10 @@ type ContactFormProps = {
 
 type ContactCardProps = {
   contact: Contact;
-  isVisible?: boolean;
-  transitionDelay?: number;
   onContactDelete: (id: string) => void;
   onContactSave: (id: string, name: string, city: string) => void;
+  className?: string;
+  style?: CSSProperties;
 };
 
 function ContactView({ contact, onStartEdit }: ContactViewProps) {
@@ -100,11 +100,11 @@ function ContactForm({
 }
 
 export default function ContactCard({
-  isVisible,
   contact,
-  transitionDelay,
   onContactDelete,
   onContactSave,
+  className = '',
+  style,
 }: ContactCardProps) {
   const [isEditing, setEditing] = useState(false);
   function startEditing() {
@@ -122,11 +122,8 @@ export default function ContactCard({
 
   return (
     <div
-      className={
-        'bg-gray-800 shadow-md rounded-xl p-5 text-gray-100 transition-all duration-500 border border-gray-700 hover:shadow-lg hover:border-gray-600 ' +
-        (isVisible ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4')
-      }
-      style={{ transitionDelay: `${transitionDelay}ms` }}
+      className={`bg-gray-800 shadow-md rounded-xl p-5 text-gray-100 transition-all duration-500 border border-gray-700 hover:shadow-lg hover:border-gray-600 ${className}`}
+      style={style}
     >
       {isEditing ? (
         <ContactForm

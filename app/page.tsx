@@ -3,7 +3,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useId, useRef, useState } from 'react';
 import { Contact, useContactsStore } from '../store/useContactsStore';
 import AddContact from './components/AddContact';
-import ContactCard from './components/ContactCard';
+import ContactsList from './components/ContactsList';
 import Pager from './components/Pager';
 import Share from './components/Share';
 
@@ -335,18 +335,12 @@ export default function Home() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl mx-auto">
-        {currentContacts.map((contact, index) => (
-          <ContactCard
-            key={contact.id}
-            isVisible={visibleCards[contact.id]}
-            transitionDelay={index * 50}
-            contact={contact}
-            onContactDelete={deleteContact}
-            onContactSave={saveChanges}
-          />
-        ))}
-      </div>
+      <ContactsList
+        contacts={currentContacts}
+        visibleCards={visibleCards}
+        onContactDelete={deleteContact}
+        onContactSave={saveChanges}
+      />
 
       {processedContacts.length > 0 && (
         <>
