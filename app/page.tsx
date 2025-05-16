@@ -7,7 +7,7 @@ import ContactsList from './components/ContactsList';
 import Pager from './components/Pager';
 import SearchField from './components/SearchField';
 import Share from './components/Share';
-import SortButton from './components/SortButton';
+import Sorter from './components/Sorter';
 
 export default function Home() {
   // Router for URL manipulation
@@ -250,34 +250,16 @@ export default function Home() {
             placeholder="Search contacts..."
           />
 
-          <div className="flex space-x-2">
-            <SortButton
-              name="name"
-              direction={isSorting && sortField === 'name' ? sortDirection : null}
-              onClick={setSortField}
-            >
-              Name
-            </SortButton>
-
-            <SortButton
-              name="city"
-              direction={isSorting && sortField === 'city' ? sortDirection : null}
-              onClick={setSortField}
-            >
-              City
-            </SortButton>
-
-            <button
-              onClick={resetSorting}
-              className={
-                !isSorting
-                  ? 'px-3 py-1 rounded-md text-sm font-medium bg-purple-600 text-white'
-                  : 'px-3 py-1 rounded-md text-sm font-medium bg-gray-700 text-gray-300 hover:bg-gray-600'
-              }
-            >
-              Reset
-            </button>
-          </div>
+          <Sorter
+            options={[
+              { name: 'name', label: 'Name' },
+              { name: 'city', label: 'City' },
+            ]}
+            field={sortField}
+            direction={sortDirection}
+            setSortField={setSortField}
+            resetSorting={resetSorting}
+          />
         </div>
       </div>
 
