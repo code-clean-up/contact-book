@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Contact, useContactsStore } from '../store/useContactsStore';
 import AddContact from './components/AddContact';
 import ContactsList from './components/ContactsList';
+import Loader from './components/Loader';
 import Pager from './components/Pager';
 import SearchField from './components/SearchField';
 import Share from './components/Share';
@@ -263,12 +264,7 @@ export default function Home() {
         </div>
       </div>
 
-      {isLoading && (
-        <div className="text-center py-10">
-          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-purple-500 border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"></div>
-          <p className="text-gray-400 mt-2">Loading contacts...</p>
-        </div>
-      )}
+      {isLoading && <Loader>Loading contacts...</Loader>}
 
       {!isLoading && processedContacts.length === 0 && (
         <div className="text-center py-10">
