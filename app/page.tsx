@@ -3,6 +3,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useId, useRef, useState } from 'react';
 import { Contact, useContactsStore } from '../store/useContactsStore';
 import AddContact from './components/AddContact';
+import ContactCard from './components/ContactCard';
 import Pager from './components/Pager';
 import Share from './components/Share';
 
@@ -329,18 +330,13 @@ export default function Home() {
       }
 
       contactCards.push(
-        <div
+        <ContactCard
           key={contact.id}
-          className={
-            'bg-gray-800 shadow-md rounded-xl p-5 text-gray-100 transition-all duration-500 border border-gray-700 hover:shadow-lg hover:border-gray-600 ' +
-            (visibleCards[contact.id]
-              ? 'opacity-100 transform translate-y-0'
-              : 'opacity-0 transform translate-y-4')
-          }
-          style={{ transitionDelay: index * 50 + 'ms' }}
+          isVisible={visibleCards[contact.id]}
+          transitionDelay={index * 50}
         >
           {cardContent}
-        </div>
+        </ContactCard>
       );
     }
   }
