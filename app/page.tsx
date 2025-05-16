@@ -236,25 +236,6 @@ export default function Home() {
     [currentPage, searchTerm, sortField, sortDirection, isSorting]
   );
 
-  const contactCards = [];
-  if (!isLoading) {
-    for (let i = 0; i < currentContacts.length; i++) {
-      const contact = currentContacts[i];
-      const index = i;
-
-      contactCards.push(
-        <ContactCard
-          key={contact.id}
-          isVisible={visibleCards[contact.id]}
-          transitionDelay={index * 50}
-          contact={contact}
-          onContactDelete={deleteContact}
-          onContactSave={saveChanges}
-        />
-      );
-    }
-  }
-
   return (
     <div className="min-h-screen bg-gray-900 p-8 pb-20 sm:p-20">
       <h1 className="mb-6 w-full text-center text-4xl font-bold text-gray-100">Contact Book</h1>
@@ -355,7 +336,16 @@ export default function Home() {
       )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl mx-auto">
-        {contactCards}
+        {currentContacts.map((contact, index) => (
+          <ContactCard
+            key={contact.id}
+            isVisible={visibleCards[contact.id]}
+            transitionDelay={index * 50}
+            contact={contact}
+            onContactDelete={deleteContact}
+            onContactSave={saveChanges}
+          />
+        ))}
       </div>
 
       {processedContacts.length > 0 && (
