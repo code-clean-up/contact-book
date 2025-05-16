@@ -2,6 +2,7 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useId, useRef, useState } from 'react';
 import { Contact, useContactsStore } from '../store/useContactsStore';
+import AddContact from './components/AddContact';
 import Pager from './components/Pager';
 import Share from './components/Share';
 
@@ -15,8 +16,6 @@ export default function Home() {
   const isFirstMount = useRef(true);
 
   // Generate unique IDs for form inputs
-  const nameInputId = useId();
-  const cityInputId = useId();
   const searchInputId = useId();
 
   // Animation states for loading and appearance effects
@@ -40,8 +39,6 @@ export default function Home() {
 
   // Initialize local form states with values from URL if available
   const [searchTerm, setSearchTerm] = useState(() => searchParams.get('search') || '');
-  const [name, setName] = useState('');
-  const [city, setCity] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
   const [editCity, setEditCity] = useState('');
@@ -205,21 +202,6 @@ export default function Home() {
     setPage(pageNumber);
   }
 
-  // Form handlers
-  function handleSubmit(e: { preventDefault: () => void }) {
-    e.preventDefault();
-
-    const trimmedName = name.trim();
-    const trimmedCity = city.trim();
-
-    if (!trimmedName || !trimmedCity) return;
-
-    addContact(trimmedName, trimmedCity);
-
-    setName('');
-    setCity('');
-  }
-
   function startEditing(contact: Contact) {
     setEditingId(contact.id);
     setEditName(contact.name);
@@ -367,51 +349,7 @@ export default function Home() {
     <div className="min-h-screen bg-gray-900 p-8 pb-20 sm:p-20">
       <h1 className="mb-6 w-full text-center text-4xl font-bold text-gray-100">Contact Book</h1>
 
-      <div className="mx-auto max-w-md w-full mb-12">
-        <form
-          onSubmit={handleSubmit}
-          className="p-6 bg-gray-800 rounded-xl shadow-lg border border-gray-700"
-        >
-          <div className="mb-4">
-            <label htmlFor={nameInputId} className="block text-sm font-medium text-gray-300 mb-1">
-              Name
-            </label>
-            <input
-              id={nameInputId}
-              type="text"
-              value={name}
-              onChange={function (e) {
-                setName(e.target.value);
-              }}
-              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-100 placeholder-gray-400"
-              placeholder="Enter name"
-            />
-          </div>
-
-          <div className="mb-5">
-            <label htmlFor={cityInputId} className="block text-sm font-medium text-gray-300 mb-1">
-              City
-            </label>
-            <input
-              id={cityInputId}
-              type="text"
-              value={city}
-              onChange={function (e) {
-                setCity(e.target.value);
-              }}
-              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-100 placeholder-gray-400"
-              placeholder="Enter city"
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="w-full bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 transition-colors font-medium cursor-pointer"
-          >
-            Add Contact
-          </button>
-        </form>
-      </div>
+      <AddContact onContactAdd={addContact} />
 
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center max-w-6xl mx-auto mb-6 px-2 space-y-4 sm:space-y-0">
         <h2 className="text-xl text-gray-300 font-medium">Contacts</h2>
