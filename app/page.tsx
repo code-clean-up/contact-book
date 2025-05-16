@@ -2,6 +2,7 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useId, useRef, useState } from 'react';
 import { Contact, useContactsStore } from '../store/useContactsStore';
+import Pager from './components/Pager';
 import Share from './components/Share';
 
 export default function Home() {
@@ -204,18 +205,6 @@ export default function Home() {
     setPage(pageNumber);
   }
 
-  function nextPage() {
-    if (currentPage < totalPages) {
-      setPage(currentPage + 1);
-    }
-  }
-
-  function prevPage() {
-    if (currentPage > 1) {
-      setPage(currentPage - 1);
-    }
-  }
-
   // Form handlers
   function handleSubmit(e: { preventDefault: () => void }) {
     e.preventDefault();
@@ -283,26 +272,6 @@ export default function Home() {
     },
     [currentPage, searchTerm, sortField, sortDirection, isSorting]
   );
-
-  const pageButtons = [];
-  for (let i = 0; i < totalPages; i++) {
-    const pageNumber = i + 1;
-    pageButtons.push(
-      <button
-        key={pageNumber}
-        onClick={function () {
-          paginate(pageNumber);
-        }}
-        className={
-          currentPage === pageNumber
-            ? 'w-10 h-10 flex justify-center items-center rounded-md text-sm bg-purple-600 text-white cursor-pointer'
-            : 'w-10 h-10 flex justify-center items-center rounded-md text-sm bg-gray-700 text-gray-200 hover:bg-gray-600 cursor-pointer'
-        }
-      >
-        {pageNumber}
-      </button>
-    );
-  }
 
   const contactCards = [];
   if (!isLoading) {
@@ -543,33 +512,7 @@ export default function Home() {
 
       {processedContacts.length > 0 && (
         <>
-          <div className="flex justify-center items-center mt-10 gap-2">
-            <button
-              onClick={prevPage}
-              disabled={currentPage === 1}
-              className={
-                currentPage === 1
-                  ? 'px-4 py-2 rounded-md text-sm bg-gray-700 text-gray-500 cursor-not-allowed'
-                  : 'px-4 py-2 rounded-md text-sm bg-gray-700 text-gray-200 hover:bg-gray-600 cursor-pointer'
-              }
-            >
-              Previous
-            </button>
-
-            <div className="flex gap-2">{pageButtons}</div>
-
-            <button
-              onClick={nextPage}
-              disabled={currentPage === totalPages}
-              className={
-                currentPage === totalPages
-                  ? 'px-4 py-2 rounded-md text-sm bg-gray-700 text-gray-500 cursor-not-allowed'
-                  : 'px-4 py-2 rounded-md text-sm bg-gray-700 text-gray-200 hover:bg-gray-600 cursor-pointer'
-              }
-            >
-              Next
-            </button>
-          </div>
+          <Pager currentPage={currentPage} totalPages={totalPages} goToPage={paginate} />
 
           <div className="text-center mt-4 text-gray-400">
             Page {currentPage} of {totalPages} • Showing {indexOfFirstContact + 1}-
