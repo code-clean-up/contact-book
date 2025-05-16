@@ -240,7 +240,7 @@ export default function Home() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-900 p-8 pb-20 sm:p-20">
+    <>
       <Title>Contact Book</Title>
 
       <AddContact onContactAdd={addContact} />
@@ -296,6 +296,6 @@ export default function Home() {
       )}
 
       <Share />
-    </div>
+    </>
   );
 }
