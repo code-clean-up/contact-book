@@ -17,10 +17,6 @@ export default function Home() {
   const cityInputId = useId();
   const searchInputId = useId();
 
-  // Animation states for loading and appearance effects
-  const [isLoading, setIsLoading] = useState(true);
-  const [visibleCards, setVisibleCards] = useState<{ [key: string]: boolean }>({});
-
   // Get global states from Zustand store
   const {
     contacts,
@@ -255,38 +251,6 @@ export default function Home() {
     setEditingId(null);
   }
 
-  // Animation effect - updated to avoid card jumping
-  useEffect(
-    function () {
-      // Clear previous timeouts
-      const timeouts: number[] = [];
-
-      const loadingTimeout = setTimeout(function () {
-        setIsLoading(false);
-
-        // After loading is complete, make all cards visible at once
-        setVisibleCards((prevState) => {
-          const newVisibleCards: { [key: string]: boolean } = {};
-
-          // Set all current contacts as visible
-          for (let i = 0; i < currentContacts.length; i++) {
-            newVisibleCards[currentContacts[i].id] = true;
-          }
-
-          return newVisibleCards;
-        });
-      }, 300) as unknown as number; // Explicitly cast to number
-
-      timeouts.push(loadingTimeout);
-
-      // Cleanup function
-      return function () {
-        timeouts.forEach((timeout) => clearTimeout(timeout));
-      };
-    },
-    [currentPage, searchTerm, sortField, sortDirection, isSorting]
-  );
-
   // Function to handle URL copying with tooltip
   function handleShare() {
     // Copy URL to clipboard
@@ -336,93 +300,87 @@ export default function Home() {
   }
 
   const contactCards = [];
-  if (!isLoading) {
-    for (let i = 0; i < currentContacts.length; i++) {
-      const contact = currentContacts[i];
-      const index = i;
+  for (let i = 0; i < currentContacts.length; i++) {
+    const contact = currentContacts[i];
+    const index = i;
 
-      let cardContent;
-      if (editingId === contact.id) {
-        cardContent = (
-          <>
-            <input
-              type="text"
-              value={editName}
-              onChange={function (e) {
-                setEditName(e.target.value);
+    let cardContent;
+    if (editingId === contact.id) {
+      cardContent = (
+        <>
+          <input
+            type="text"
+            value={editName}
+            onChange={function (e) {
+              setEditName(e.target.value);
+            }}
+            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md mb-3 focus:outline-none focus:ring-1 focus:ring-purple-500 text-gray-100"
+          />
+          <input
+            type="text"
+            value={editCity}
+            onChange={function (e) {
+              setEditCity(e.target.value);
+            }}
+            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md mb-4 focus:outline-none focus:ring-1 focus:ring-purple-500 text-gray-100"
+          />
+          <div className="flex justify-between mt-4">
+            <button
+              onClick={function () {
+                deleteContact(contact.id);
               }}
-              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md mb-3 focus:outline-none focus:ring-1 focus:ring-purple-500 text-gray-100"
-            />
-            <input
-              type="text"
-              value={editCity}
-              onChange={function (e) {
-                setEditCity(e.target.value);
-              }}
-              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md mb-4 focus:outline-none focus:ring-1 focus:ring-purple-500 text-gray-100"
-            />
-            <div className="flex justify-between mt-4">
+              className="bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-red-700 transition-colors flex items-center shadow-sm cursor-pointer"
+            >
+              <span>Delete</span>
+            </button>
+            <div className="flex space-x-3">
+              <button
+                onClick={cancelEditing}
+                className="bg-gray-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-700 transition-colors shadow-sm cursor-pointer"
+              >
+                Cancel
+              </button>
               <button
                 onClick={function () {
-                  deleteContact(contact.id);
+                  saveChanges(contact.id);
                 }}
-                className="bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-red-700 transition-colors flex items-center shadow-sm cursor-pointer"
+                className="bg-purple-500 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-purple-600 transition-colors shadow-sm cursor-pointer"
               >
-                <span>Delete</span>
-              </button>
-              <div className="flex space-x-3">
-                <button
-                  onClick={cancelEditing}
-                  className="bg-gray-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-700 transition-colors shadow-sm cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={function () {
-                    saveChanges(contact.id);
-                  }}
-                  className="bg-purple-500 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-purple-600 transition-colors shadow-sm cursor-pointer"
-                >
-                  Save
-                </button>
-              </div>
-            </div>
-          </>
-        );
-      } else {
-        cardContent = (
-          <>
-            <h2 className="text-xl font-semibold text-gray-100 mb-1">{contact.name}</h2>
-            <p className="text-gray-400 mb-4">{contact.city}</p>
-            <div className="flex justify-end mt-2">
-              <button
-                onClick={function () {
-                  startEditing(contact);
-                }}
-                className="border border-purple-400 text-purple-400 px-4 py-2 rounded-md text-sm font-medium hover:border-purple-300 hover:text-purple-300 transition-colors shadow-sm cursor-pointer"
-              >
-                Edit
+                Save
               </button>
             </div>
-          </>
-        );
-      }
-
-      contactCards.push(
-        <div
-          key={contact.id}
-          className={
-            'bg-gray-800 shadow-md rounded-xl p-5 text-gray-100 transition-all duration-500 border border-gray-700 hover:shadow-lg hover:border-gray-600 ' +
-            (visibleCards[contact.id]
-              ? 'opacity-100 transform translate-y-0'
-              : 'opacity-0 transform translate-y-4')
-          }
-          style={{ transitionDelay: index * 50 + 'ms' }}
-        >
-          {cardContent}
-        </div>
+          </div>
+        </>
+      );
+    } else {
+      cardContent = (
+        <>
+          <h2 className="text-xl font-semibold text-gray-100 mb-1">{contact.name}</h2>
+          <p className="text-gray-400 mb-4">{contact.city}</p>
+          <div className="flex justify-end mt-2">
+            <button
+              onClick={function () {
+                startEditing(contact);
+              }}
+              className="border border-purple-400 text-purple-400 px-4 py-2 rounded-md text-sm font-medium hover:border-purple-300 hover:text-purple-300 transition-colors shadow-sm cursor-pointer"
+            >
+              Edit
+            </button>
+          </div>
+        </>
       );
     }
+
+    contactCards.push(
+      <div
+        key={contact.id}
+        className={
+          'bg-gray-800 shadow-md rounded-xl p-5 text-gray-100 transition-all duration-500 border border-gray-700 hover:shadow-lg hover:border-gray-600'
+        }
+      >
+        {cardContent}
+      </div>
+    );
   }
 
   return (
@@ -547,14 +505,7 @@ export default function Home() {
         </div>
       </div>
 
-      {isLoading && (
-        <div className="text-center py-10">
-          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-purple-500 border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"></div>
-          <p className="text-gray-400 mt-2">Loading contacts...</p>
-        </div>
-      )}
-
-      {!isLoading && processedContacts.length === 0 && (
+      {processedContacts.length === 0 && searchTerm && (
         <div className="text-center py-10">
           <p className="text-gray-400 text-lg">No contacts found matching "{searchTerm}"</p>
           <button
