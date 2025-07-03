@@ -3,14 +3,12 @@ import ContactCard from './ContactCard';
 
 type ContactsListProps = {
   contacts: Contact[];
-  visibleCards: { [key: string]: boolean };
   onContactDelete: (id: string) => void;
   onContactSave: (id: string, name: string, city: string) => void;
 };
 
 export default function ContactsList({
   contacts,
-  visibleCards,
   onContactDelete,
   onContactSave,
 }: ContactsListProps) {
@@ -19,13 +17,7 @@ export default function ContactsList({
       {contacts.map((contact, index) => (
         <ContactCard
           key={contact.id}
-          className={
-            'transition-all duration-500 ' +
-            (visibleCards[contact.id]
-              ? 'opacity-100 transform translate-y-0'
-              : 'opacity-0 transform translate-y-4')
-          }
-          style={{ transitionDelay: `${index * 50}ms` }}
+          className={'transition-all duration-500'}
           contact={contact}
           onContactDelete={onContactDelete}
           onContactSave={onContactSave}

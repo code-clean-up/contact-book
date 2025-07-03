@@ -26,11 +26,6 @@ export default function Home() {
   // Animation states for loading and appearance effects
   const [isLoading, setIsLoading] = useState(true);
   const [visibleCards, setVisibleCards] = useState<{ [key: string]: boolean }>({});
-    
-  // Generate unique IDs for form inputs
-  const nameInputId = useId();
-  const cityInputId = useId();
-  const searchInputId = useId();
 
   // Get global states from Zustand store
   const {
@@ -281,12 +276,13 @@ export default function Home() {
         </EmptyResults>
       )}
 
-      <ContactsList
-        contacts={currentContacts}
-        visibleCards={visibleCards}
-        onContactDelete={deleteContact}
-        onContactSave={saveChanges}
-      />
+      {!isLoading && processedContacts.length > 0 && (
+        <ContactsList
+          contacts={currentContacts}
+          onContactDelete={deleteContact}
+          onContactSave={saveChanges}
+        />
+      )}
 
       {processedContacts.length > 0 && (
         <>
