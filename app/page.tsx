@@ -7,7 +7,7 @@ import ContactsList from './components/ContactsList';
 import EmptyResults from './components/EmptyResults';
 import Footer from './components/Footer';
 import ListHeader from './components/ListHeader';
-import Loader from './components/Loader';
+import CardSkeleton from './components/CardSkeleton';
 import Pager from './components/Pager';
 import SearchField from './components/SearchField';
 import Share from './components/Share';
@@ -25,7 +25,6 @@ export default function Home() {
 
   // Animation states for loading and appearance effects
   const [isLoading, setIsLoading] = useState(true);
-  const [visibleCards, setVisibleCards] = useState<{ [key: string]: boolean }>({});
 
   // Get global states from Zustand store
   const {
@@ -210,30 +209,11 @@ export default function Home() {
   // Animation effect - updated to avoid card jumping
   useEffect(
     function () {
-      // Clear previous timeouts
-      const timeouts: number[] = [];
-
-      const loadingTimeout = setTimeout(function () {
+      const timeout = setTimeout(function () {
         setIsLoading(false);
-
-        // After loading is complete, make all cards visible at once
-        setVisibleCards((prevState) => {
-          const newVisibleCards: { [key: string]: boolean } = {};
-
-          // Set all current contacts as visible
-          for (let i = 0; i < currentContacts.length; i++) {
-            newVisibleCards[currentContacts[i].id] = true;
-          }
-
-          return newVisibleCards;
-        });
-      }, 300) as unknown as number; // Explicitly cast to number
-
-      timeouts.push(loadingTimeout);
-
-      // Cleanup function
+      }, 600);
       return function () {
-        timeouts.forEach((timeout) => clearTimeout(timeout));
+        clearTimeout(timeout);
       };
     },
     [currentPage, searchTerm, sortField, sortDirection, isSorting]
@@ -264,9 +244,13 @@ export default function Home() {
         />
       </ListHeader>
 
-      {isLoading && <Loader>Loading contacts...</Loader>}
-
-      {!isLoading && processedContacts.length === 0 && (
+      {isLoading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl mx-auto mt-6">
+          {Array.from({ length: contactsPerPage }).map((_, i) => (
+            <CardSkeleton key={i} />
+          ))}
+        </div>
+      ) : processedContacts.length === 0 ? (
         <EmptyResults
           onSearchClean={function () {
             setSearchTerm('');
@@ -274,9 +258,7 @@ export default function Home() {
         >
           No contacts found matching "{searchTerm}"
         </EmptyResults>
-      )}
-
-      {!isLoading && processedContacts.length > 0 && (
+      ) : (
         <ContactsList
           contacts={currentContacts}
           onContactDelete={deleteContact}
