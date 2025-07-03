@@ -136,7 +136,7 @@ export default function ContactCard({
 
   return (
     <div
-      className={`bg-gray-800 shadow-md rounded-xl p-5 text-gray-100 transition-all duration-500 border border-gray-700 hover:shadow-lg hover:border-gray-600 ${className}`}
+      className={`bg-gray-800 shadow-md rounded-xl p-5 text-gray-100 transition-all duration-500 border border-gray-700 ${className}`}
       style={style}
     >
       {isEditing ? (
