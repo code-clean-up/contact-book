@@ -1,4 +1,4 @@
-import { useId, useState } from 'react';
+import { useId, useRef, useState } from 'react';
 
 export type AddContactProps = {
   onContactAdd: (name: string, city: string) => void;
@@ -7,27 +7,26 @@ export type AddContactProps = {
 export default function AddContact({ onContactAdd }: AddContactProps) {
   const nameInputId = useId();
   const cityInputId = useId();
-  const [name, setName] = useState('');
-  const [city, setCity] = useState('');
 
-  function handleSubmit(e: { preventDefault: () => void }) {
-    e.preventDefault();
+  const formRef = useRef<HTMLFormElement>(null);
 
-    const trimmedName = name.trim();
-    const trimmedCity = city.trim();
+  async function handleSubmit(formData: FormData) {
+    const trimmedName = formData.get('name')?.toString().trim();
+    const trimmedCity = formData.get('city')?.toString().trim();
+
+    console.log({ trimmedName, trimmedCity });
 
     if (!trimmedName || !trimmedCity) return;
 
     onContactAdd(trimmedName, trimmedCity);
 
-    setName('');
-    setCity('');
+    formRef.current?.reset();
   }
 
   return (
     <div className="mx-auto max-w-md w-full mb-12">
       <form
-        onSubmit={handleSubmit}
+        action={handleSubmit}
         className="p-6 bg-gray-800 rounded-xl shadow-lg border border-gray-700"
       >
         <div className="mb-4">
@@ -37,10 +36,6 @@ export default function AddContact({ onContactAdd }: AddContactProps) {
           <input
             id={nameInputId}
             name="name"
-            value={name}
-            onChange={function (e) {
-              setName(e.target.value);
-            }}
             type="text"
             className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-100 placeholder-gray-400"
             placeholder="Enter name"
@@ -53,10 +48,6 @@ export default function AddContact({ onContactAdd }: AddContactProps) {
           </label>
           <input
             id={cityInputId}
-            value={city}
-            onChange={function (e) {
-              setCity(e.target.value);
-            }}
             name="city"
             type="text"
             className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-100 placeholder-gray-400"
