@@ -1,5 +1,5 @@
 import { Contact } from '@/store/useContactsStore';
-import { CSSProperties, useState } from 'react';
+import { CSSProperties, useRef, useState } from 'react';
 
 type ContactViewProps = {
   contact: Contact;
@@ -46,41 +46,31 @@ function ContactForm({
   onCancelEditing,
   onContactSave,
 }: ContactFormProps) {
-  const [editName, setEditName] = useState(contact.name);
-  const [editCity, setEditCity] = useState(contact.city);
+  const formRef = useRef<HTMLFormElement>(null);
 
-  function handleSubmit(e: { preventDefault: () => void }) {
-    e.preventDefault();
-
-    const trimmedName = editName.trim();
-    const trimmedCity = editCity.trim();
+  function handleSubmit(formData: FormData) {
+    const trimmedName = formData.get('name')?.toString().trim();
+    const trimmedCity = formData.get('city')?.toString().trim();
 
     if (!trimmedName || !trimmedCity) return;
 
     onContactSave(contact.id, trimmedName, trimmedCity);
 
-    setEditName('');
-    setEditCity('');
+    formRef.current?.reset();
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form action={handleSubmit}>
       <input
         type="text"
         name="name"
-        value={editName}
-        onChange={function (e) {
-          setEditName(e.target.value);
-        }}
+        defaultValue={contact.name}
         className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md mb-3 focus:outline-none focus:ring-1 focus:ring-purple-500 text-gray-100"
       />
       <input
         type="text"
         name="city"
-        value={editCity}
-        onChange={function (e) {
-          setEditCity(e.target.value);
-        }}
+        defaultValue={contact.city}
         className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md mb-4 focus:outline-none focus:ring-1 focus:ring-purple-500 text-gray-100"
       />
       <div className="flex justify-between mt-4">
