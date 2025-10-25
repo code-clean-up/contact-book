@@ -1,4 +1,4 @@
-import { useId, useRef, useState } from 'react';
+import { useId, useRef } from 'react';
 
 export type AddContactProps = {
   onContactAdd: (name: string, city: string) => void;
@@ -27,6 +27,7 @@ export default function AddContact({ onContactAdd }: AddContactProps) {
     <div className="mx-auto max-w-md w-full mb-12">
       <form
         action={handleSubmit}
+        ref={formRef}
         className="p-6 bg-gray-800 rounded-xl shadow-lg border border-gray-700"
       >
         <div className="mb-4">

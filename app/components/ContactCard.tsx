@@ -60,7 +60,7 @@ function ContactForm({
   }
 
   return (
-    <form action={handleSubmit}>
+    <form action={handleSubmit} ref={formRef}>
       <input
         type="text"
         name="name"
