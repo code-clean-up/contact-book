@@ -13,6 +13,7 @@ import SearchField from './components/SearchField';
 import Share from './components/Share';
 import Sorter from './components/Sorter';
 import Title from './components/Title';
+import { sortContacts } from './utils/sortContacts';
 
 export default function Home() {
   // Router for URL manipulation
@@ -128,7 +129,7 @@ export default function Home() {
   );
 
   // Filter contacts based on search term
-  const filteredContacts = [];
+  const filteredContacts: Contact[] = [];
   for (let i = 0; i < contacts.length; i++) {
     const contact = contacts[i];
     if (!searchTerm) {
@@ -144,39 +145,7 @@ export default function Home() {
   }
 
   // Create a processed copy of filtered contacts for sorting
-  let processedContacts = [];
-  for (let i = 0; i < filteredContacts.length; i++) {
-    processedContacts.push(filteredContacts[i]);
-  }
-
-  // Apply sorting if enabled
-  if (isSorting) {
-    // Bubble sort implementation remains unchanged
-    for (let i = 0; i < processedContacts.length; i++) {
-      for (let j = 0; j < processedContacts.length - i - 1; j++) {
-        const fieldA = processedContacts[j][sortField].toLowerCase();
-        const fieldB = processedContacts[j + 1][sortField].toLowerCase();
-
-        let shouldSwap = false;
-
-        if (sortDirection === 'asc') {
-          if (fieldA > fieldB) {
-            shouldSwap = true;
-          }
-        } else {
-          if (fieldA < fieldB) {
-            shouldSwap = true;
-          }
-        }
-
-        if (shouldSwap) {
-          const temp: Contact = processedContacts[j];
-          processedContacts[j] = processedContacts[j + 1];
-          processedContacts[j + 1] = temp;
-        }
-      }
-    }
-  }
+  const processedContacts = sortContacts(filteredContacts, isSorting, sortField, sortDirection);
 
   // Update search term and page
   function handleSearchChange(value: string) {
@@ -187,12 +156,6 @@ export default function Home() {
   // Calculate pagination values
   const indexOfLastContact = currentPage * contactsPerPage;
   const indexOfFirstContact = indexOfLastContact - contactsPerPage;
-
-  // Get current page contacts
-  const currentContacts: any[] = [];
-  for (let i = indexOfFirstContact; i < indexOfLastContact && i < processedContacts.length; i++) {
-    currentContacts.push(processedContacts[i]);
-  }
 
   // Calculate total pages
   const totalPages = Math.ceil(processedContacts.length / contactsPerPage);
@@ -260,7 +223,7 @@ export default function Home() {
         </EmptyResults>
       ) : (
         <ContactsList
-          contacts={currentContacts}
+          contacts={processedContacts}
           onContactDelete={deleteContact}
           onContactSave={saveChanges}
         />
