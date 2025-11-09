@@ -145,7 +145,9 @@ export default function Home() {
   }
 
   // Create a processed copy of filtered contacts for sorting
-  const processedContacts = sortContacts(filteredContacts, isSorting, sortField, sortDirection);
+  const processedContacts = isSorting ?
+    sortContacts(filteredContacts, sortField, sortDirection) :
+    filteredContacts;
 
   // Update search term and page
   function handleSearchChange(value: string) {
