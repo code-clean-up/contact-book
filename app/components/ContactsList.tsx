@@ -1,4 +1,4 @@
-import { Contact } from '@/store/useContactsStore';
+import { Contact } from '@/app/store/useContactsStore';
 import ContactCard from './ContactCard';
 
 type ContactsListProps = {

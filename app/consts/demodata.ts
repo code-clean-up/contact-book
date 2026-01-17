@@ -1,37 +1,5 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-
-/**
- * Base contact structure
- */
-export interface Contact {
-  id: string;
-  name: string;
-  city: string;
-}
-
-/**
- * Complete store state and available operations
- */
-interface ContactsState {
-  // State properties
-  contacts: Contact[];
-  sortField: 'name' | 'city';
-  sortDirection: 'asc' | 'desc';
-  isSorting: boolean; // Controls whether to use original or sorted order
-  currentPage: number;
-
-  // Available operations
-  addContact: (name: string, city: string) => void;
-  updateContact: (id: string, name: string, city: string) => void;
-  deleteContact: (id: string) => void;
-  setSortField: (field: 'name' | 'city') => void;
-  resetSorting: () => void;
-  setPage: (page: number) => void;
-}
-
 // Initial demo data
-const initialContacts = [
+export const DEMO_CONTACTS = [
   { id: '1', name: 'Alice Johnson', city: 'New York' },
   { id: '2', name: 'Bob Smith', city: 'Los Angeles' },
   { id: '3', name: 'Charlie Brown', city: 'Chicago' },
@@ -93,53 +61,3 @@ const initialContacts = [
   { id: '59', name: 'George Schmidt', city: 'Pittsburgh' },
   { id: '60', name: 'Hannah Warren', city: 'Lexington' },
 ];
-
-// Create store with localStorage persistence
-export const useContactsStore = create<ContactsState>()(
-  persist(
-    (set) => ({
-      contacts: initialContacts,
-
-      // CRUD operations
-      addContact: (name, city) =>
-        set((state) => ({
-          contacts: [{ id: `${Date.now()}`, name, city }, ...state.contacts],
-        })),
-
-      updateContact: (id, name, city) =>
-        set((state) => ({
-          contacts: state.contacts.map((contact) =>
-            contact.id === id ? { ...contact, name, city } : contact
-          ),
-        })),
-
-      deleteContact: (id) =>
-        set((state) => ({
-          contacts: state.contacts.filter((contact) => contact.id !== id),
-        })),
-
-      // Sorting functionality
-      sortField: 'name',
-      sortDirection: 'asc',
-      isSorting: true,
-
-      setSortField: (field) =>
-        set((state) => ({
-          isSorting: true,
-          sortField: field,
-          // Toggle direction if same field, otherwise default to ascending
-          sortDirection:
-            field === state.sortField ? (state.sortDirection === 'asc' ? 'desc' : 'asc') : 'asc',
-        })),
-
-      resetSorting: () => set({ isSorting: false }),
-
-      // Pagination
-      currentPage: 1,
-      setPage: (page) => set({ currentPage: page }),
-    }),
-    {
-      name: 'contacts-storage',
-    }
-  )
-);

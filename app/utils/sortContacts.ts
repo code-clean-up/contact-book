@@ -1,4 +1,4 @@
-import type { Contact } from '@/store/useContactsStore';
+import type { Contact } from '@/app/store/useContactsStore';
 
 export function sortContacts(
   contacts: Contact[],

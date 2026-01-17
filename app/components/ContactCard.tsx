@@ -1,4 +1,4 @@
-import { Contact } from '@/store/useContactsStore';
+import { Contact } from '@/app/store/useContactsStore';
 import { CSSProperties, useRef, useState } from 'react';
 
 type ContactViewProps = {

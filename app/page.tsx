@@ -1,18 +1,19 @@
 'use client';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import { Contact, useContactsStore } from '../store/useContactsStore';
 import AddContact from './components/AddContact';
+import CardSkeleton from './components/CardSkeleton';
 import ContactsList from './components/ContactsList';
 import EmptyResults from './components/EmptyResults';
 import Footer from './components/Footer';
 import ListHeader from './components/ListHeader';
-import CardSkeleton from './components/CardSkeleton';
 import Pager from './components/Pager';
 import SearchField from './components/SearchField';
 import Share from './components/Share';
 import Sorter from './components/Sorter';
 import Title from './components/Title';
+import { CONTACTS_PER_PAGE } from './consts/consts';
+import { Contact, useContactsStore } from './store/useContactsStore';
 import { sortContacts } from './utils/sortContacts';
 
 export default function Home() {
@@ -44,9 +45,6 @@ export default function Home() {
 
   // Initialize local form states with values from URL if available
   const [searchTerm, setSearchTerm] = useState(() => searchParams.get('search') || '');
-
-  // Pagination constants
-  const contactsPerPage = 9;
 
   // Effect to sync URL parameters with application state - runs only once on mount
   useEffect(function () {
@@ -151,18 +149,18 @@ export default function Home() {
   }
 
   // Calculate pagination values
-  const indexOfLastContact = currentPage * contactsPerPage;
-  const indexOfFirstContact = indexOfLastContact - contactsPerPage;
+  const indexOfLastContact = currentPage * CONTACTS_PER_PAGE;
+  const indexOfFirstContact = indexOfLastContact - CONTACTS_PER_PAGE;
 
   // Create a processed copy of filtered contacts for sorting
-  const processedContacts = isSorting ?
-    sortContacts(filteredContacts, sortField, sortDirection) :
-    filteredContacts;
+  const processedContacts = isSorting
+    ? sortContacts(filteredContacts, sortField, sortDirection)
+    : filteredContacts;
 
-  const slicedContacts = processedContacts.slice(indexOfFirstContact, indexOfLastContact)
+  const slicedContacts = processedContacts.slice(indexOfFirstContact, indexOfLastContact);
 
   // Calculate total pages
-  const totalPages = Math.ceil(processedContacts.length / contactsPerPage);
+  const totalPages = Math.ceil(processedContacts.length / CONTACTS_PER_PAGE);
 
   // Pagination handlers
   function paginate(pageNumber: number) {
@@ -213,7 +211,7 @@ export default function Home() {
 
       {isLoading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl mx-auto mt-6">
-          {Array.from({ length: contactsPerPage }).map((_, i) => (
+          {Array.from({ length: CONTACTS_PER_PAGE }).map((_, i) => (
             <CardSkeleton key={i} />
           ))}
         </div>
