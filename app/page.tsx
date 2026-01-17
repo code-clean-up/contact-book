@@ -144,11 +144,6 @@ export default function Home() {
     }
   }
 
-  // Create a processed copy of filtered contacts for sorting
-  const processedContacts = isSorting ?
-    sortContacts(filteredContacts, sortField, sortDirection) :
-    filteredContacts;
-
   // Update search term and page
   function handleSearchChange(value: string) {
     setSearchTerm(value);
@@ -158,6 +153,13 @@ export default function Home() {
   // Calculate pagination values
   const indexOfLastContact = currentPage * contactsPerPage;
   const indexOfFirstContact = indexOfLastContact - contactsPerPage;
+
+  // Create a processed copy of filtered contacts for sorting
+  const processedContacts = isSorting ?
+    sortContacts(filteredContacts, sortField, sortDirection) :
+    filteredContacts;
+
+  const slicedContacts = processedContacts.slice(indexOfFirstContact, indexOfLastContact)
 
   // Calculate total pages
   const totalPages = Math.ceil(processedContacts.length / contactsPerPage);
@@ -225,7 +227,7 @@ export default function Home() {
         </EmptyResults>
       ) : (
         <ContactsList
-          contacts={processedContacts}
+          contacts={slicedContacts}
           onContactDelete={deleteContact}
           onContactSave={saveChanges}
         />
