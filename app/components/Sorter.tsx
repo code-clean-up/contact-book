@@ -1,8 +1,8 @@
 import SortButton from './SortButton';
 
 type Sorter<T extends string> = {
-  field: T | null;
-  direction: 'asc' | 'desc';
+  field?: T | null;
+  direction?: 'asc' | 'desc';
   options: { name: T; label: string }[];
   setSortField: (field: T) => void;
   resetSorting: () => void;
@@ -21,7 +21,7 @@ export default function Sorter<T extends string>({
         <SortButton
           key={value}
           name={value}
-          direction={field === value ? direction : null}
+          direction={field === value && direction ? direction : null}
           onClick={setSortField}
         >
           {label}
