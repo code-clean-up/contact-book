@@ -13,8 +13,7 @@ import Share from './components/Share';
 import Sorter from './components/Sorter';
 import Title from './components/Title';
 import { CONTACTS_PER_PAGE } from './consts/consts';
-import { Contact, useContactsStore } from './store/useContactsStore';
-import { sortContacts } from './utils/sortContacts';
+import { getContacts, getPagination, useContactsStore } from './store/useContactsStore';
 
 export default function Home() {
   // Router for URL manipulation
@@ -30,21 +29,19 @@ export default function Home() {
 
   // Get global states from Zustand store
   const {
-    contacts,
     addContact,
     updateContact,
     deleteContact,
-    sortField,
-    sortDirection,
-    isSorting,
+    sort,
     setSortField,
     resetSorting,
-    currentPage,
     setPage,
+    searchTerm,
+    setSearchTerm,
   } = useContactsStore();
-
-  // Initialize local form states with values from URL if available
-  const [searchTerm, setSearchTerm] = useState(() => searchParams.get('search') || '');
+  const slicedContacts = useContactsStore(getContacts);
+  const { total, totalPages, last, first, currentPage, isFiltered } =
+    useContactsStore(getPagination);
 
   // Effect to sync URL parameters with application state - runs only once on mount
   useEffect(function () {
@@ -65,12 +62,10 @@ export default function Home() {
         if (sorting) {
           // Manually update the store to avoid double updates
           useContactsStore.setState({
-            sortField: sort,
-            sortDirection: direction,
-            isSorting: true,
+            sort: { field: sort, direction },
           });
         } else {
-          useContactsStore.setState({ isSorting: false });
+          useContactsStore.setState({ sort: null });
         }
       }
 
@@ -101,9 +96,9 @@ export default function Home() {
       params.set('search', searchTerm);
     }
 
-    if (isSorting) {
-      params.set('sort', sortField);
-      params.set('dir', sortDirection);
+    if (sort) {
+      params.set('sort', sort.field);
+      params.set('dir', sort.direction);
       params.set('sorting', 'true');
     } else {
       params.set('sorting', 'false');
@@ -123,44 +118,14 @@ export default function Home() {
         updateURLParams();
       }
     },
-    [searchTerm, sortField, sortDirection, isSorting, currentPage]
+    [searchTerm, sort, currentPage]
   );
-
-  // Filter contacts based on search term
-  const filteredContacts: Contact[] = [];
-  for (let i = 0; i < contacts.length; i++) {
-    const contact = contacts[i];
-    if (!searchTerm) {
-      filteredContacts.push(contact);
-    } else {
-      const search = searchTerm.toLowerCase();
-      const nameMatch = contact.name.toLowerCase().indexOf(search) !== -1;
-      const cityMatch = contact.city.toLowerCase().indexOf(search) !== -1;
-      if (nameMatch || cityMatch) {
-        filteredContacts.push(contact);
-      }
-    }
-  }
 
   // Update search term and page
   function handleSearchChange(value: string) {
     setSearchTerm(value);
     setPage(1); // Reset to first page on search change
   }
-
-  // Calculate pagination values
-  const indexOfLastContact = currentPage * CONTACTS_PER_PAGE;
-  const indexOfFirstContact = indexOfLastContact - CONTACTS_PER_PAGE;
-
-  // Create a processed copy of filtered contacts for sorting
-  const processedContacts = isSorting
-    ? sortContacts(filteredContacts, sortField, sortDirection)
-    : filteredContacts;
-
-  const slicedContacts = processedContacts.slice(indexOfFirstContact, indexOfLastContact);
-
-  // Calculate total pages
-  const totalPages = Math.ceil(processedContacts.length / CONTACTS_PER_PAGE);
 
   // Pagination handlers
   function paginate(pageNumber: number) {
@@ -181,7 +146,7 @@ export default function Home() {
         clearTimeout(timeout);
       };
     },
-    [currentPage, searchTerm, sortField, sortDirection, isSorting]
+    [currentPage, searchTerm, sort]
   );
 
   return (
@@ -202,8 +167,8 @@ export default function Home() {
             { name: 'name', label: 'Name' },
             { name: 'city', label: 'City' },
           ]}
-          field={sortField}
-          direction={sortDirection}
+          field={sort?.field ?? null}
+          direction={sort?.direction ?? null}
           setSortField={setSortField}
           resetSorting={resetSorting}
         />
@@ -215,7 +180,7 @@ export default function Home() {
             <CardSkeleton key={i} />
           ))}
         </div>
-      ) : processedContacts.length === 0 ? (
+      ) : total === 0 ? (
         <EmptyResults
           onSearchClean={function () {
             setSearchTerm('');
@@ -231,14 +196,14 @@ export default function Home() {
         />
       )}
 
-      {processedContacts.length > 0 && (
+      {total > 0 && (
         <>
           <Pager currentPage={currentPage} totalPages={totalPages} goToPage={paginate} />
 
           <Footer>
-            Page {currentPage} of {totalPages} • Showing {indexOfFirstContact + 1}-
-            {Math.min(indexOfLastContact, processedContacts.length)} of {processedContacts.length}
-            {searchTerm ? ' filtered' : ''} contacts
+            Page {currentPage} of {totalPages} • Showing {first + 1}-{Math.min(last, total)} of{' '}
+            {total}
+            {isFiltered ? ' filtered' : ''} contacts
           </Footer>
         </>
       )}

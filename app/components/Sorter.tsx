@@ -2,7 +2,7 @@ import SortButton from './SortButton';
 
 type Sorter<T extends string> = {
   field: T | null;
-  direction: 'asc' | 'desc';
+  direction: 'asc' | 'desc' | null;
   options: { name: T; label: string }[];
   setSortField: (field: T) => void;
   resetSorting: () => void;
